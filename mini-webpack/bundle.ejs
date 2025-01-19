@@ -1,0 +1,29 @@
+(function (modules) {
+  function require(id) {
+    let module = { exports: {} };
+
+    // TODO 如何通过 filename 找到对应的函数呢？
+    // key filename  -> fn
+    // 1. 需要通过 filename 找到对应的模块函数
+    const [fn,mapping] = modules[id];
+
+    function localRequire(filename){
+      const id = mapping[filename]
+      return require(id)
+    }
+
+    fn(localRequire, module, module.exports);
+
+    return module.exports;
+  }
+
+  require(1)
+})({
+  <% Object.keys(modules).forEach((key)=>{ %> 
+  <%= key %> : [function (require, module, exports) {
+    <%- modules[key][0] %> 
+  }, 
+    <%- JSON.stringify(modules[key][1]) %> 
+  ],
+  <% }) %> 
+});
